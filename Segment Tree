@@ -1,0 +1,107 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+class SegmentTree
+{
+    public:
+    vector<int> seg;
+    SegmentTree(int n)
+    {
+        seg.resize(4*n , 0);
+    }
+    void build(vector<int>&arr, int ind, int low, int high)
+    {
+        if(low==high)
+        {
+            seg[ind] = arr[low];
+            return;
+        }
+        int mid = (high-low)/2 + low;
+        build(arr,2*ind+1,low,mid);
+        build(arr,2*ind+2,mid+1,high);
+        
+        seg[ind] = min(seg[2*ind+1],seg[2*ind+2]);
+    }
+    int query(int ind, int low, int high, int left, int right)
+    {
+        if(high<left || right<low)
+        {
+            return INT_MAX;
+        }
+        if(low>=left && high<=right)
+        {
+            return seg[ind];
+        }
+        
+        int mid = (high+low)>>1;
+        int l = query(2*ind+1,low,mid,left,right);
+        int r = query(2*ind+2,mid+1,high,left,right);
+        
+        return min(l,r);
+    }
+    
+    void update(int ind,int low, int high ,int i, int val)
+    {
+        if(low==high)
+        {
+            seg[ind] = val;
+            return ;
+        }
+        int mid = (high+low)>>1;///2 + low;
+        if(i<=mid)
+        {
+            update(2*ind+1,low,mid,i,val);
+        }
+        else
+        {
+            update(2*ind+2,mid+1,high,i,val);
+        }
+        
+        seg[ind] = min(seg[2*ind+1],seg[2*ind+2]);
+    }
+    
+    void print()
+    {
+        for(int i=0; i<seg.size();i++)
+        {
+            cout<<i<<"-->"<<seg[i]<<endl;
+        }
+    }
+};
+
+int main()
+{
+    vector<int> arr;
+    int n;
+    cin>>n; 
+    for(int i=0; i<n;i++)
+    {
+        int x;
+        cin>>x;
+        arr.push_back(x);
+    }
+    SegmentTree st1(n);
+    st1.build(arr,0,0,n-1);
+    int test;
+    cin>>test;
+    
+    while(test--)
+    {
+        int left,right;
+        cin>>left>>right;
+        cout<<st1.query(0,0,n-1,left,right)<<endl;
+    }
+    //st1.print();//void update(int ind,int low, int high ,int i, int val)
+    st1.update(0,0,n-1, 2,4);
+     
+    test = 3;
+    while(test--)
+    {
+        int left,right;
+        cin>>left>>right;
+        cout<<st1.query(0,0,n-1,left,right)<<endl;
+    }
+    cout<<endl;
+    //st1.print();
+    return 0;
+}
